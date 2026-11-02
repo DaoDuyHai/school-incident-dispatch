@@ -33,7 +33,7 @@ COPY --chown=node:node --from=dependencies /app/node_modules ./node_modules
 
 # Sao chép mã nguồn ứng dụng với quyền non-root
 COPY --chown=node:node package.json ./
-COPY --chown=node:node server.js seed.js ./
+COPY --chown=node:node app.js server.js seed.js ./
 COPY --chown=node:node config/ ./config/
 COPY --chown=node:node controllers/ ./controllers/
 COPY --chown=node:node middlewares/ ./middlewares/
