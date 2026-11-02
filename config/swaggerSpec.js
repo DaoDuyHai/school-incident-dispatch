@@ -54,8 +54,9 @@ export const swaggerDocument = {
           },
           department: {
             type: 'string',
-            enum: ['TECHNICAL', 'MEDICAL', 'GENERAL'],
-            example: 'GENERAL',
+            enum: ['TECHNICAL', 'MEDICAL'],
+            nullable: true,
+            example: 'TECHNICAL',
           },
           createdAt: { type: 'string', format: 'date-time' },
         },
@@ -71,12 +72,7 @@ export const swaggerDocument = {
           location: { type: 'string', example: 'Phòng học B204, Tòa B' },
           type: {
             type: 'string',
-            enum: [
-              'Hỏng điện/Nước/Thiết bị',
-              'Sơ cứu/Y tế',
-              'Vệ sinh/Môi trường',
-              'Khác',
-            ],
+            enum: ['Hỏng điện/Nước/Thiết bị', 'Tai nạn/Sức khỏe/Cấp cứu'],
             example: 'Hỏng điện/Nước/Thiết bị',
           },
           department: {
@@ -84,9 +80,13 @@ export const swaggerDocument = {
             enum: ['TECHNICAL', 'MEDICAL'],
             example: 'TECHNICAL',
           },
+          description: {
+            type: 'string',
+            example: 'Cần sửa gấp trong sáng nay',
+          },
           status: {
             type: 'string',
-            enum: ['PENDING', 'IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
+            enum: ['PENDING', 'IN_PROGRESS', 'RESOLVED'],
             example: 'PENDING',
           },
           reporter: {
@@ -95,6 +95,7 @@ export const swaggerDocument = {
               _id: { type: 'string' },
               fullName: { type: 'string' },
               userName: { type: 'string' },
+              department: { type: 'string', nullable: true },
             },
           },
           responder: {
@@ -103,6 +104,7 @@ export const swaggerDocument = {
             properties: {
               _id: { type: 'string' },
               fullName: { type: 'string' },
+              userName: { type: 'string' },
               department: { type: 'string' },
             },
           },
@@ -116,10 +118,14 @@ export const swaggerDocument = {
         type: 'object',
         properties: {
           success: { type: 'boolean', example: true },
+          message: {
+            type: 'string',
+            example: 'Get incident analytics successfully.',
+          },
           data: {
             type: 'object',
             properties: {
-              kpi: {
+              summary: {
                 type: 'object',
                 properties: {
                   total: { type: 'number', example: 45 },
@@ -128,17 +134,14 @@ export const swaggerDocument = {
                   resolved: { type: 'number', example: 28 },
                 },
               },
-              departmentDistribution: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    department: { type: 'string', example: 'TECHNICAL' },
-                    count: { type: 'number', example: 30 },
-                  },
+              byDepartment: {
+                type: 'object',
+                properties: {
+                  TECHNICAL: { type: 'number', example: 30 },
+                  MEDICAL: { type: 'number', example: 15 },
                 },
               },
-              topHotspots: {
+              topLocations: {
                 type: 'array',
                 items: {
                   type: 'object',
@@ -189,12 +192,18 @@ export const swaggerDocument = {
                 required: ['userName', 'password', 'fullName'],
                 properties: {
                   userName: { type: 'string', example: 'student_new' },
-                  password: { type: 'string', example: 'securePass123' },
+                  password: { type: 'string', example: '123456' },
                   fullName: { type: 'string', example: 'Lê Hoàng Nam' },
                   role: {
                     type: 'string',
-                    enum: ['student', 'teacher'],
+                    enum: ['student', 'teacher', 'dispatcher', 'admin'],
                     example: 'student',
+                  },
+                  department: {
+                    type: 'string',
+                    enum: ['TECHNICAL', 'MEDICAL'],
+                    description: 'Bắt buộc khi role là dispatcher',
+                    example: 'TECHNICAL',
                   },
                 },
               },
@@ -222,7 +231,7 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['userName', 'password'],
                 properties: {
-                  userName: { type: 'string', example: 'student01' },
+                  userName: { type: 'string', example: 'admin01' },
                   password: { type: 'string', example: '123' },
                 },
               },
@@ -243,6 +252,7 @@ export const swaggerDocument = {
                       type: 'string',
                       example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     },
+                    data: { $ref: '#/components/schemas/User' },
                   },
                 },
               },
@@ -252,23 +262,49 @@ export const swaggerDocument = {
         },
       },
     },
-    '/api/users/me': {
+    '/api/users/profile': {
       get: {
-        summary: 'Lấy thông tin người dùng hiện tại',
+        summary: 'Lấy thông tin người dùng đang đăng nhập (Profile)',
         tags: ['Authentication'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { description: 'Thông tin người dùng đang đăng nhập' },
+          200: {
+            description: 'Thông tin tài khoản đã giải mã từ Token',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: {
+                      type: 'string',
+                      example: 'Get user profile successfully.',
+                    },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        userId: { type: 'string' },
+                        userName: { type: 'string' },
+                        fullName: { type: 'string' },
+                        role: { type: 'string' },
+                        department: { type: 'string', nullable: true },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
           401: { description: 'Chưa đăng nhập hoặc token không hợp lệ' },
         },
       },
     },
     '/api/incidents': {
       post: {
-        summary: 'Báo cáo sự cố mới',
+        summary: 'Báo cáo sự cố mới (Học sinh / Giáo viên)',
         description:
-          'Học sinh hoặc Giáo viên tạo sự cố mới, hệ thống tự động phân loại phòng ban và bắn WebSocket thông báo.',
-        tags: ['Incidents'],
+          'Học sinh hoặc Giáo viên tạo sự cố mới. Hệ thống tự động phân loại phòng ban (TECHNICAL nếu hỏng thiết bị, MEDICAL nếu tai nạn) và phát thông báo WebSocket tới đúng phòng ban.',
+        tags: ['Incidents (Reporter)'],
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -287,9 +323,7 @@ export const swaggerDocument = {
                     type: 'string',
                     enum: [
                       'Hỏng điện/Nước/Thiết bị',
-                      'Sơ cứu/Y tế',
-                      'Vệ sinh/Môi trường',
-                      'Khác',
+                      'Tai nạn/Sức khỏe/Cấp cứu',
                     ],
                     example: 'Hỏng điện/Nước/Thiết bị',
                   },
@@ -304,11 +338,12 @@ export const swaggerDocument = {
         },
         responses: {
           201: { description: 'Tạo sự cố thành công, trạng thái PENDING' },
-          400: { description: 'Dữ liệu thiếu hoặc không hợp lệ' },
+          400: { description: 'Dữ liệu thiếu hoặc loại sự cố không hợp lệ' },
+          403: { description: 'Chỉ học sinh hoặc giáo viên mới được báo cáo' },
         },
       },
       get: {
-        summary: 'Lấy danh sách tất cả sự cố (Phân trang & Lọc)',
+        summary: 'Lấy toàn bộ sự cố toàn trường (Admin - Phân trang & Lọc)',
         tags: ['Incidents (Admin)'],
         security: [{ bearerAuth: [] }],
         parameters: [
@@ -316,29 +351,34 @@ export const swaggerDocument = {
             name: 'page',
             in: 'query',
             schema: { type: 'integer', default: 1 },
+            description: 'Số thứ tự trang (mặc định: 1)',
           },
           {
             name: 'limit',
             in: 'query',
             schema: { type: 'integer', default: 10 },
+            description: 'Số bản ghi trên mỗi trang (mặc định: 10)',
           },
           {
             name: 'status',
             in: 'query',
             schema: {
               type: 'string',
-              enum: ['PENDING', 'IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
+              enum: ['PENDING', 'IN_PROGRESS', 'RESOLVED'],
             },
+            description: 'Lọc theo trạng thái sự cố',
           },
           {
             name: 'department',
             in: 'query',
             schema: { type: 'string', enum: ['TECHNICAL', 'MEDICAL'] },
+            description: 'Lọc theo phòng ban phụ trách',
           },
         ],
         responses: {
           200: {
-            description: 'Danh sách sự cố phân trang kèm tổng số bản ghi',
+            description:
+              'Danh sách sự cố phân trang kèm thông tin tổng bản ghi',
           },
           403: {
             description: 'Quyền truy cập bị từ chối (Chỉ dành cho Admin)',
@@ -346,9 +386,23 @@ export const swaggerDocument = {
         },
       },
     },
+    '/api/incidents/my-reports': {
+      get: {
+        summary: 'Xem danh sách sự cố do chính mình báo cáo (Reporter)',
+        tags: ['Incidents (Reporter)'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Danh sách các sự cố do người dùng đăng nhập tạo ra',
+          },
+        },
+      },
+    },
     '/api/incidents/pending': {
       get: {
-        summary: 'Xem sự cố chờ tiếp nhận theo khoa',
+        summary: 'Xem danh sách sự cố đang chờ xử lý theo khoa (Dispatcher)',
+        description:
+          'Dispatcher chỉ xem được các sự cố có trạng thái PENDING thuộc đúng khoa mình phụ trách (TECHNICAL hoặc MEDICAL).',
         tags: ['Incidents (Dispatcher)'],
         security: [{ bearerAuth: [] }],
         responses: {
@@ -362,35 +416,20 @@ export const swaggerDocument = {
         },
       },
     },
-    '/api/incidents/my-incidents': {
+    '/api/incidents/my-tasks': {
       get: {
-        summary: 'Lịch sử sự cố do bản thân báo cáo',
-        tags: ['Incidents (Reporter)'],
+        summary: 'Xem danh sách sự cố do mình đang phụ trách (Dispatcher)',
+        description:
+          'Lấy danh sách các sự cố mà nhân viên điều phối hiện tại đã bấm nhận (responder = userId).',
+        tags: ['Incidents (Dispatcher)'],
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
-            description: 'Danh sách sự cố của chính người dùng đăng nhập',
+            description: 'Danh sách các ca sự cố được phân công cho mình',
           },
-        },
-      },
-    },
-    '/api/incidents/{id}': {
-      get: {
-        summary: 'Xem chi tiết sự cố theo ID',
-        tags: ['Incidents'],
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          {
-            name: 'id',
-            in: 'path',
-            required: true,
-            schema: { type: 'string' },
-            description: 'Mã ObjectId sự cố',
+          403: {
+            description: 'Chỉ nhân viên Dispatcher mới có quyền truy cập',
           },
-        ],
-        responses: {
-          200: { description: 'Chi tiết thông tin sự cố' },
-          404: { description: 'Không tìm thấy sự cố với ID đã cho' },
         },
       },
     },
@@ -398,7 +437,7 @@ export const swaggerDocument = {
       patch: {
         summary: 'Tiếp nhận sự cố (Khóa nguyên tử chống Race Condition)',
         description:
-          'Dispatcher nhận xử lý sự cố. Sử dụng findOneAndUpdate nguyên tử. Nếu ca đã được người khác nhận trước, trả về 409 Conflict.',
+          'Dispatcher bấm nhận xử lý sự cố. Sử dụng toán tử findOneAndUpdate nguyên tử. Nếu sự cố đã được đồng nghiệp nhận trước tại cùng một mili-giây, hệ thống lập tức chặn lại và phản hồi 409 Conflict.',
         tags: ['Incidents (Dispatcher)'],
         security: [{ bearerAuth: [] }],
         parameters: [
@@ -407,6 +446,7 @@ export const swaggerDocument = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
+            description: 'Mã ObjectId của sự cố',
           },
         ],
         responses: {
@@ -426,7 +466,9 @@ export const swaggerDocument = {
     },
     '/api/incidents/{id}/resolve': {
       patch: {
-        summary: 'Hoàn tất nghiệm thu sự cố',
+        summary: 'Nghiệm thu hoàn tất sự cố (Dispatcher)',
+        description:
+          'Dispatcher hoàn thành công việc và đóng ca. Chỉ đúng người đã nhận ca (responder) mới được quyền nghiệm thu hoàn tất.',
         tags: ['Incidents (Dispatcher)'],
         security: [{ bearerAuth: [] }],
         parameters: [
@@ -435,6 +477,7 @@ export const swaggerDocument = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
+            description: 'Mã ObjectId của sự cố',
           },
         ],
         requestBody: {
@@ -448,7 +491,7 @@ export const swaggerDocument = {
                   resolutionNotes: {
                     type: 'string',
                     example:
-                      'Đã thay mới linh kiện và kiểm tra chạy thử an toàn.',
+                      'Đã thay mới van ống nước và kiểm tra áp lực chạy thử an toàn.',
                   },
                 },
               },
@@ -460,13 +503,22 @@ export const swaggerDocument = {
             description:
               'Nghiệm thu thành công, trạng thái chuyển sang RESOLVED',
           },
-          403: { description: 'Chỉ người phụ trách ca mới được quyền đóng ca' },
+          400: {
+            description:
+              'Sự cố chưa ở trạng thái IN_PROGRESS hoặc thiếu ghi chú',
+          },
+          403: {
+            description: 'Chỉ đúng người phụ trách ca mới được quyền đóng ca',
+          },
         },
       },
     },
     '/api/incidents/analytics': {
       get: {
-        summary: 'Thống kê KPI & Phân tích điểm nóng (MongoDB Aggregation)',
+        summary:
+          'Thống kê KPI & Phân tích điểm nóng (Admin - MongoDB Aggregation)',
+        description:
+          'Sử dụng MongoDB Aggregation Pipeline ($facet, $group, $sort) để tính toán số liệu tổng quan, tỷ lệ theo khoa và Top 3 vị trí hay xảy ra sự cố nhất.',
         tags: ['Analytics (Admin)'],
         security: [{ bearerAuth: [] }],
         responses: {

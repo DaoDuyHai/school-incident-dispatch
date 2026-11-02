@@ -21,8 +21,13 @@ describe('Swagger / OpenAPI 3.0 Documentation Endpoint Tests', () => {
       'School Incident Dispatch API'
     );
     expect(response.body.paths).toHaveProperty('/api/users/login');
+    expect(response.body.paths).toHaveProperty('/api/users/profile');
     expect(response.body.paths).toHaveProperty('/api/incidents');
+    expect(response.body.paths).toHaveProperty('/api/incidents/my-reports');
+    expect(response.body.paths).toHaveProperty('/api/incidents/pending');
+    expect(response.body.paths).toHaveProperty('/api/incidents/my-tasks');
     expect(response.body.paths).toHaveProperty('/api/incidents/{id}/accept');
+    expect(response.body.paths).toHaveProperty('/api/incidents/{id}/resolve');
     expect(response.body.paths).toHaveProperty('/api/incidents/analytics');
     expect(response.body.paths).toHaveProperty('/health');
   });
