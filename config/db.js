@@ -1,12 +1,15 @@
-import mongoose from "mongoose";
-import { env } from "./env.js";
+import mongoose from 'mongoose';
+import { env } from './env.js';
+import { logger } from './logger.js';
 
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    logger.info(
+      `MongoDB Connected successfully to host: ${conn.connection.host}`
+    );
   } catch (error) {
-    console.error(`MongoDB connection failed: ${error.message}`);
+    logger.error(`MongoDB connection failed: ${error.message}`);
     process.exit(1);
   }
 };

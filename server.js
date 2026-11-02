@@ -144,14 +144,12 @@ app.use(errorHandler);
 const gracefulShutdown = (signal) => {
   if (isShuttingDown) return;
   isShuttingDown = true;
-  console.log(
-    `\n🛑 [Shutdown] Received ${signal}. Starting graceful shutdown...`
-  );
+  logger.info(`[SHUTDOWN] Received ${signal}. Starting graceful shutdown...`);
 
   // Đặt timeout an toàn: Buộc ngắt process nếu các kết nối còn nghẽn quá 10 giây
   const forceTimeout = setTimeout(() => {
-    console.error(
-      '⚠️ [Shutdown] Graceful shutdown timed out (10s). Forcing exit (1).'
+    logger.error(
+      '[SHUTDOWN] Graceful shutdown timed out (10s). Forcing exit (1).'
     );
     process.exit(1);
   }, 10000);
@@ -160,31 +158,27 @@ const gracefulShutdown = (signal) => {
   // 1. Dừng tiếp nhận request HTTP mới, cho phép các request đang xử lý dở hoàn tất
   httpServer.close((err) => {
     if (err) {
-      console.error('❌ [Shutdown] Error closing HTTP server:', err);
+      logger.error({ err }, '[SHUTDOWN] Error closing HTTP server');
       process.exit(1);
     }
-    console.log(
-      '✅ [Shutdown] HTTP server closed. In-flight requests completed.'
-    );
+    logger.info('[SHUTDOWN] HTTP server closed. In-flight requests completed.');
 
     // 2. Đóng toàn bộ kết nối WebSocket (Socket.io)
     io.close(() => {
-      console.log('✅ [Shutdown] Socket.io connections closed.');
+      logger.info('[SHUTDOWN] Socket.io connections closed.');
 
       // 3. Đóng kết nối cơ sở dữ liệu MongoDB an toàn
       mongoose.connection
         .close(false)
         .then(() => {
-          console.log('✅ [Shutdown] MongoDB connection closed safely.');
-          console.log(
-            '👋 [Shutdown] Process terminated gracefully with code 0.'
-          );
+          logger.info('[SHUTDOWN] MongoDB connection closed safely.');
+          logger.info('[SHUTDOWN] Process terminated gracefully with code 0.');
           process.exit(0);
         })
         .catch((dbErr) => {
-          console.error(
-            '❌ [Shutdown] Error closing MongoDB connection:',
-            dbErr
+          logger.error(
+            { err: dbErr },
+            '[SHUTDOWN] Error closing MongoDB connection'
           );
           process.exit(1);
         });
@@ -200,7 +194,7 @@ if (process.env.NODE_ENV !== 'test') {
 const PORT = env.PORT || 3000;
 if (process.env.NODE_ENV !== 'test') {
   httpServer.listen(PORT, () => {
-    logger.info(`🚀 Server is running on port ${PORT}`);
+    logger.info(`[SERVER] Server is running on port ${PORT}`);
   });
 }
 

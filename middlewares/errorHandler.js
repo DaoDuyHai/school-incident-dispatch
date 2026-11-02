@@ -1,3 +1,5 @@
+import { logger } from '../config/logger.js';
+
 export const errorHandler = (error, req, res, _next) => {
   let statusCode = error.statusCode || 500;
   let message = error.message || 'Internal server error.';
@@ -35,13 +37,19 @@ export const errorHandler = (error, req, res, _next) => {
     if (req.log) {
       req.log.error(
         { err: error, requestId, statusCode },
-        '🔥 Internal Server Error'
+        '[SERVER ERROR] Internal Server Error'
       );
     } else {
-      console.error('🔥 [Internal Server Error]:', error);
+      logger.error(
+        { err: error, requestId, statusCode },
+        '[SERVER ERROR] Internal Server Error'
+      );
     }
   } else if (req.log) {
-    req.log.warn({ statusCode, message, requestId }, '⚠️ Client Handled Error');
+    req.log.warn(
+      { statusCode, message, requestId },
+      '[CLIENT ERROR] Client Handled Error'
+    );
   }
 
   return res.status(statusCode).json({

@@ -38,7 +38,7 @@ export const requestLogger = (req, res, next) => {
         ip: req.ip,
         userAgent: req.headers['user-agent'],
       },
-      '📥 Incoming request'
+      '[INCOMING] Incoming request'
     );
   }
 
@@ -59,11 +59,11 @@ export const requestLogger = (req, res, next) => {
     };
 
     if (statusCode >= 500) {
-      req.log.error(logData, '💥 Server error response');
+      req.log.error(logData, '[SERVER ERROR] Server error response');
     } else if (statusCode >= 400) {
-      req.log.warn(logData, '⚠️ Client error response');
+      req.log.warn(logData, '[CLIENT ERROR] Client error response');
     } else {
-      req.log.info(logData, '📤 Request completed successfully');
+      req.log.info(logData, '[SUCCESS] Request completed successfully');
     }
   });
 
