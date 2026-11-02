@@ -3,8 +3,27 @@ export const swaggerDocument = {
   info: {
     title: 'School Incident Dispatch API',
     version: '1.0.0',
-    description:
-      'Hệ thống Backend RESTful API & Real-time Event Dispatching phục vụ điều phối và xử lý sự cố học đường. Xây dựng bằng Node.js Express 5, MongoDB, Socket.io, JWT RBAC và Docker.',
+    description: `### 🏫 Hệ Thống Điều Phối & Xử Lý Sự Cố Học Đường (Real-time Event Dispatching)
+Xây dựng bằng **Node.js (Express 5)**, **MongoDB (Mongoose)**, **Socket.io**, **Pino Logger** và **Docker**.
+
+---
+
+### 🔑 Tài Khoản Mẫu Kiểm Thử (Mật khẩu chung cho tất cả: \`123\`)
+
+| Tài khoản | Vai trò (Role) | Phòng ban (Department) | Quyền hạn kiểm thử |
+| :--- | :--- | :--- | :--- |
+| **\`admin01\`** | \`admin\` | Ban Giám Hiệu | Xem toàn bộ sự cố toàn trường, xem thống kê KPI Analytics |
+| **\`tech01\`** | \`dispatcher\` | \`TECHNICAL\` | Xem sự cố điện/nước chờ xử lý, nhận việc (Atomic Lock), nghiệm thu |
+| **\`tech02\`** | \`dispatcher\` | \`MEDICAL\` | Xem sự cố y tế/cấp cứu chờ xử lý, nhận việc |
+| **\`student01\`** | \`student\` | Học sinh | Báo cáo sự cố mới, xem lịch sử các sự cố của chính mình |
+
+---
+
+### 🚀 Hướng Dẫn Test Nhanh Trong 3 Bước (Dưới 30 Giây):
+1. **Bước 1:** Mở mục **Authentication** $\\rightarrow$ chọn **\`POST /api/users/login\`** $\\rightarrow$ bấm **Try it out** $\\rightarrow$ bấm **Execute** (đã điền sẵn tài khoản \`admin01\` / \`123\`).
+2. **Bước 2:** Sao chép chuỗi mã \`token\` ở khung kết quả JSON phía dưới.
+3. **Bước 3:** Cuộn lên đầu trang, bấm nút **Authorize 🔓** (màu xanh lá) $\\rightarrow$ dán token vào ô giá trị $\\rightarrow$ bấm **Authorize** $\\rightarrow$ **Close**.
+*Xong! Giờ bạn có thể bấm **Try it out** ở bất kỳ API nào phía dưới (ví dụ \`GET /api/incidents/analytics\` hoặc \`GET /api/incidents\`) để xem dữ liệu thật!*`,
     contact: {
       name: 'Đào Duy Hải',
       url: 'https://github.com/DaoDuyHai/school-incident-dispatch',
