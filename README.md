@@ -2,8 +2,8 @@
 ## (SCHOOL INCIDENT DISPATCH SYSTEM)
 
 [![CI/CD Pipeline](https://github.com/DaoDuyHai/school-incident-dispatch/actions/workflows/ci.yml/badge.svg)](https://github.com/DaoDuyHai/school-incident-dispatch/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Fly.io-24185b?logo=flydotio&logoColor=white)](https://school-incident-dispatch.fly.dev/)
-[![Swagger Docs](https://img.shields.io/badge/API_Docs-OpenAPI%203.0-85EA2D?logo=swagger&logoColor=black)](https://school-incident-dispatch.fly.dev/docs)
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Render-46E3B7?logo=render&logoColor=black)](https://school-incident-dispatch.onrender.com/)
+[![Swagger Docs](https://img.shields.io/badge/API_Docs-OpenAPI%203.0-85EA2D?logo=swagger&logoColor=black)](https://school-incident-dispatch.onrender.com/docs)
 [![Node.js](https://img.shields.io/badge/Node.js-v20+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
@@ -18,9 +18,9 @@
 > **Backend RESTful API & Real-time Event Dispatching System**  
 > Xây dựng với **Node.js, Express 5, MongoDB (Mongoose), Socket.io, Pino Structured Logging và JWT RBAC**.  
 > Tác giả: **Đào Duy Hải** ([@DaoDuyHai](https://github.com/DaoDuyHai))  
-> 🌐 **Live Demo (Production):** [https://school-incident-dispatch.fly.dev](https://school-incident-dispatch.fly.dev)  
-> 📄 **Tài liệu Swagger UI tương tác:** [https://school-incident-dispatch.fly.dev/docs](https://school-incident-dispatch.fly.dev/docs)  
-> 🩺 **Health Check Diagnostics:** [https://school-incident-dispatch.fly.dev/health](https://school-incident-dispatch.fly.dev/health)  
+> 🌐 **Live Demo (Production):** [https://school-incident-dispatch.onrender.com](https://school-incident-dispatch.onrender.com)  
+> 📄 **Tài liệu Swagger UI tương tác:** [https://school-incident-dispatch.onrender.com/docs](https://school-incident-dispatch.onrender.com/docs)  
+> 🩺 **Health Check Diagnostics:** [https://school-incident-dispatch.onrender.com/health](https://school-incident-dispatch.onrender.com/health)  
 > 📁 **GitHub Repository:** [https://github.com/DaoDuyHai/school-incident-dispatch](https://github.com/DaoDuyHai/school-incident-dispatch)
 
 ---
@@ -66,7 +66,7 @@ flowchart TD
     end
 
     subgraph Gateway["API Gateway & Real-time Layer"]
-        LoadBalancer["Fly.io Edge Proxy (Singapore)\n- HTTPS Termination\n- Anycast Routing"]
+        LoadBalancer["Render.com Edge Proxy (Singapore)\n- HTTPS Termination\n- Anycast Routing"]
         ExpressServer["Node.js Express 5 Application\n- Request Logger & Tracing (Pino + UUID)\n- JWT RBAC Guards (401 / 403)\n- Centralized Error Handler"]
         SocketEngine["Socket.io WebSocket Server\n- Handshake JWT Auth\n- Targeted Rooms Routing"]
     end
@@ -115,7 +115,7 @@ flowchart TD
 | **Container** | Docker & Docker Compose | Multi-stage build (Alpine 47 MB), non-root `node:node`, kiểm tra `/health` |
 | **Kiểm thử** | Vitest, Supertest, V8 Coverage | Bộ 41 tests tự động (Unit, Mock, Integration, Stress, Isolation) |
 | **Tải & Đo đạc** | Autocannon | Kiểm thử tải áp lực cao (Benchmarking throughput & latency) |
-| **CI/CD** | GitHub Actions & Fly.io | Kiểm tra tự động hóa & Rolling Deployment máy chủ Singapore |
+| **CI/CD & Cloud** | GitHub Actions & Render | Kiểm tra tự động hóa & Cloud Hosting Singapore |
 
 ---
 
@@ -237,7 +237,7 @@ school-incident-dispatch/
 │   └── SchoolIncidentDispatch.postman_collection.json # Bộ sưu tập Postman Auto-Token
 ├── Dockerfile                   # Multi-stage Dockerfile (Node 20 Alpine, Non-root 47 MB)
 ├── docker-compose.yml           # Khởi chạy App + MongoDB 6.0 bằng 1 lệnh duy nhất
-└── fly.toml                     # Cấu hình máy chủ Singapore Fly.io
+└── render.yaml                  # Cấu hình hạ tầng Cloud Render.com (Singapore)
 ```
 
 ---
@@ -245,7 +245,7 @@ school-incident-dispatch/
 ## 6. TÀI LIỆU REST API & SWAGGER UI (12 ENDPOINTS)
 
 Trang tài liệu Swagger tương tác trực tiếp được xuất bản công khai tại:  
-👉 **[https://school-incident-dispatch.fly.dev/docs](https://school-incident-dispatch.fly.dev/docs)**
+👉 **[https://school-incident-dispatch.onrender.com/docs](https://school-incident-dispatch.onrender.com/docs)**
 
 | Method | Endpoint | Tên chức năng | Phân quyền RBAC | Mô tả kỹ thuật |
 | :---: | :--- | :--- | :---: | :--- |
@@ -254,12 +254,12 @@ Trang tài liệu Swagger tương tác trực tiếp được xuất bản công
 | `GET` | `/docs` | Swagger UI Documentation | Công khai | Giao diện tài liệu OpenAPI 3.0 trực quan |
 | `POST` | `/api/users/register` | Đăng ký tài khoản | Công khai | Đăng ký tài khoản học sinh / giáo viên thông thường |
 | `POST` | `/api/users/login` | Đăng nhập hệ thống | Công khai | Xác thực Bcrypt, cấp JWT Bearer Token |
-| `GET` | `/api/users/me` | Lấy profile cá nhân | Mọi User | Đọc thông tin người dùng từ Token đã giải mã |
+| `GET` | `/api/users/profile` | Lấy profile cá nhân | Mọi User | Đọc thông tin người dùng từ Token đã giải mã |
 | `POST` | `/api/incidents` | Báo cáo sự cố mới | `student`, `teacher` | Tự động gán trạng thái `PENDING`, bắn Socket theo khoa |
 | `GET` | `/api/incidents` | Danh sách toàn trường | `admin` | Phân trang `.skip().limit()`, lọc `status` và `department` |
+| `GET` | `/api/incidents/my-reports`| Lịch sử cá nhân | `student`, `teacher` | Xem các sự cố do chính tài khoản tạo ra |
 | `GET` | `/api/incidents/pending`| Danh sách ca chờ | `dispatcher` | Lọc các ca `PENDING` theo đúng khoa phụ trách |
-| `GET` | `/api/incidents/my-incidents`| Lịch sử cá nhân | Mọi User | Xem các sự cố do chính tài khoản tạo ra |
-| `GET` | `/api/incidents/:id` | Chi tiết sự cố | Mọi User | Xem thông tin sự cố kèm người báo và người phụ trách |
+| `GET` | `/api/incidents/my-tasks`| Danh sách ca phụ trách | `dispatcher` | Lọc các ca do chính Dispatcher đang tiếp nhận xử lý |
 | `PATCH` | `/api/incidents/:id/accept` | Tiếp nhận sự cố | `dispatcher` | **Khóa nguyên tử:** Đổi sang `IN_PROGRESS` (Chặn 409 nếu trùng) |
 | `PATCH` | `/api/incidents/:id/resolve`| Hoàn tất sự cố | `dispatcher` | Chuyển `RESOLVED`, ghi nhận biên bản nghiệm thu |
 | `GET` | `/api/incidents/analytics` | Thống kê KPI & Hotspots | `admin` | Aggregation Pipeline: KPI, tỷ lệ khoa, Top 3 điểm nóng |
@@ -402,7 +402,7 @@ Mỗi khi có commit được `push` hoặc tạo `pull_request` vào nhánh `ma
 4. **Kiểm tra chuẩn mã nguồn:** Quét lỗi cú pháp bằng `npm run lint` (**0 errors, 0 warnings**).
 5. **Chạy toàn bộ 41 Test Suites:** Thực thi `npm run test:coverage` (100% tests pass).
 6. **Cập nhật Badge tự động:** Huy hiệu CI Status trên đầu README tự động chuyển sang màu xanh lá (`passing`).
-7. **Tự động Triển khai lên Production (Continuous Deployment):** Nếu toàn bộ test vượt qua thành công, GitHub Actions tự động kết nối qua `FLY_API_TOKEN`, đóng gói Dockerfile và triển khai phiên bản mới nhất lên Fly.io (`https://school-incident-dispatch.fly.dev`) với cơ chế Zero-downtime rolling update.
+7. **Tự động Triển khai lên Production (Render.com):** Render tự động đồng bộ từ branch `main`, đóng gói Dockerfile multi-stage và triển khai phiên bản mới nhất lên Render.com (`https://school-incident-dispatch.onrender.com`) với domain HTTPS miễn phí.
 
 ---
 
@@ -421,7 +421,7 @@ Dự án đính kèm sẵn file cấu hình Postman hoàn chỉnh tại:
 
 ## 11. LỘ TRÌNH MỞ RỘNG (FUTURE ROADMAP)
 
-- [x] **Continuous Integration & Deployment (CI/CD):** Tự động test và deploy lên Fly.io khi push code.
+- [x] **Continuous Integration & Deployment (CI/CD):** Tự động test bằng GitHub Actions và deploy lên Render.com.
 - [x] **Containerization & Health Checks:** Đóng gói Docker Multi-stage, Graceful shutdown (SIGTERM).
 - [x] **Observability & Tracing:** Structured logging (Pino) kết hợp `requestId` Correlation ID.
 - [x] **Performance Benchmarks:** Đo đạc tải Autocannon, Index Explain stats và triệt tiêu N+1 queries.
@@ -437,5 +437,5 @@ Dự án đính kèm sẵn file cấu hình Postman hoàn chỉnh tại:
 - **GitHub:** [@DaoDuyHai](https://github.com/DaoDuyHai)
 - **Email:** `duyhai12121212@gmail.com`
 - **Repository:** [https://github.com/DaoDuyHai/school-incident-dispatch](https://github.com/DaoDuyHai/school-incident-dispatch)
-- **Live Demo:** [https://school-incident-dispatch.fly.dev](https://school-incident-dispatch.fly.dev)
-- **Swagger Documentation:** [https://school-incident-dispatch.fly.dev/docs](https://school-incident-dispatch.fly.dev/docs)
+- **Live Demo:** [https://school-incident-dispatch.onrender.com](https://school-incident-dispatch.onrender.com)
+- **Swagger Documentation:** [https://school-incident-dispatch.onrender.com/docs](https://school-incident-dispatch.onrender.com/docs)

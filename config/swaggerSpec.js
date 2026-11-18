@@ -31,8 +31,8 @@ Xây dựng bằng **Node.js (Express 5)**, **MongoDB (Mongoose)**, **Socket.io*
   },
   servers: [
     {
-      url: 'https://school-incident-dispatch.fly.dev',
-      description: 'Production Server (Fly.io Singapore)',
+      url: 'https://school-incident-dispatch.onrender.com',
+      description: 'Production Server (Render.com Singapore)',
     },
     {
       url: 'http://localhost:3000',

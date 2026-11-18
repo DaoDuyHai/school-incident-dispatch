@@ -47,21 +47,3 @@ jobs:
 
       - name: 🧪 Run Automated Tests with Coverage (Vitest)
         run: npm run test:coverage
-
-  deploy:
-    name: 🚀 Continuous Deployment to Fly.io
-    needs: lint-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📥 Check out repository code
-        uses: actions/checkout@v4
-
-      - name: ✈️ Set up Flyctl CLI
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: 🚀 Deploy to Fly.io
-        run: flyctl deploy --remote-only --ha=false
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -44,7 +44,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 4. Health-check & Readiness Endpoint cho Docker / Kubernetes / Fly.io
+// 4. Health-check & Readiness Endpoint cho Docker / Kubernetes / Render
 app.get('/health', (req, res) => {
   const isDbConnected = mongoose.connection.readyState === 1;
   const healthData = {
